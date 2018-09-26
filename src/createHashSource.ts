@@ -1,9 +1,13 @@
 // hash path utilities taken from ReactTraining's History package
 // https://github.com/ReactTraining/history/blob/master/modules/createHashHistory.js
+const hasWindow = (): boolean => {
+  return typeof window !== `undefined`
+}
+
 const getHashPath = (): string => {
   // Can't use window.location.hash here because it's not
   // consistent across browsers - Firefox will pre-decode it!
-  const href = window.location.href
+  const href = hasWindow() ? window.location.href : ''
   const hashIndex = href.indexOf('#')
   return hashIndex === -1 ? '' : href.substring(hashIndex + 1)
 }
@@ -11,11 +15,13 @@ const getHashPath = (): string => {
 const pushHashPath = (path: string) => (window.location.hash = path)
 
 const replaceHashPath = (path: string) => {
-  const hashIndex = window.location.href.indexOf('#')
+  if (hasWindow()) {
+    const hashIndex = window.location.href.indexOf('#')
 
-  window.location.replace(
-    window.location.href.slice(0, hashIndex >= 0 ? hashIndex : 0) + '#' + path
-  )
+    window.location.replace(
+      window.location.href.slice(0, hashIndex >= 0 ? hashIndex : 0) + '#' + path
+    )
+  }
 }
 
 const getState = (path?: string) => {
@@ -39,10 +45,10 @@ const createHashSource = () => {
       return getState()
     },
     addEventListener(name, fn) {
-      window.addEventListener(name, fn)
+      hasWindow() && window.addEventListener(name, fn)
     },
     removeEventListener(name, fn) {
-      window.removeEventListener(name, fn)
+      hasWindow() && window.removeEventListener(name, fn)
     },
     history: {
       state,

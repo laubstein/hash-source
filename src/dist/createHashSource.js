@@ -1,12 +1,17 @@
+var hasWindow = function () {
+    return typeof window !== "undefined";
+};
 var getHashPath = function () {
-    var href = window.location.href;
+    var href = hasWindow() ? window.location.href : '';
     var hashIndex = href.indexOf('#');
     return hashIndex === -1 ? '' : href.substring(hashIndex + 1);
 };
 var pushHashPath = function (path) { return (window.location.hash = path); };
 var replaceHashPath = function (path) {
-    var hashIndex = window.location.href.indexOf('#');
-    window.location.replace(window.location.href.slice(0, hashIndex >= 0 ? hashIndex : 0) + '#' + path);
+    if (hasWindow()) {
+        var hashIndex = window.location.href.indexOf('#');
+        window.location.replace(window.location.href.slice(0, hashIndex >= 0 ? hashIndex : 0) + '#' + path);
+    }
 };
 var getState = function (path) {
     var pathname = path ? path : getHashPath();
@@ -25,10 +30,10 @@ var createHashSource = function () {
             return getState();
         },
         addEventListener: function (name, fn) {
-            window.addEventListener(name, fn);
+            hasWindow() && window.addEventListener(name, fn);
         },
         removeEventListener: function (name, fn) {
-            window.removeEventListener(name, fn);
+            hasWindow() && window.removeEventListener(name, fn);
         },
         history: {
             state: state,
